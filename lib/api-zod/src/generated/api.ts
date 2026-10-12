@@ -18,23 +18,64 @@ export const HealthCheckResponse = zod.object({
 
 
 /**
- * Returns an AI response using the conversation history in the request.
+ * @summary List saved conversations
+ */
+export const ListConversationsResponseItem = zod.object({
+  "id": zod.string().uuid(),
+  "title": zod.string(),
+  "updatedAt": zod.coerce.date()
+})
+export const ListConversationsResponse = zod.array(ListConversationsResponseItem)
+
+
+/**
+ * @summary Retrieve a saved conversation
+ */
+export const GetConversationParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const getConversationResponseMessagesItemContentMax = 50000;
+
+
+
+export const GetConversationResponse = zod.object({
+  "id": zod.string().uuid(),
+  "title": zod.string(),
+  "messages": zod.array(zod.object({
+  "role": zod.enum(['user', 'assistant']),
+  "content": zod.string().min(1).max(getConversationResponseMessagesItemContentMax)
+})),
+  "createdAt": zod.coerce.date(),
+  "updatedAt": zod.coerce.date()
+})
+
+
+/**
+ * @summary Delete a saved conversation
+ */
+export const DeleteConversationParams = zod.object({
+  "id": zod.coerce.string().uuid()
+})
+
+export const DeleteConversationResponse = zod.void()
+
+
+/**
+ * Returns an AI response and saves the exchange to Supabase.
  * @summary Send a message to the AI assistant
  */
-export const sendChatMessageBodyMessagesItemContentMax = 12000;
-
-export const sendChatMessageBodyMessagesMax = 24;
+export const sendChatMessageBodyMessageMax = 12000;
 
 
 
 export const SendChatMessageBody = zod.object({
-  "messages": zod.array(zod.object({
-  "role": zod.enum(['user', 'assistant']),
-  "content": zod.string().min(1).max(sendChatMessageBodyMessagesItemContentMax)
-})).min(1).max(sendChatMessageBodyMessagesMax)
+  "conversationId": zod.string().uuid().nullish().describe('Existing conversation to continue, or null to start a new one'),
+  "message": zod.string().min(1).max(sendChatMessageBodyMessageMax)
 })
 
 export const SendChatMessageResponse = zod.object({
+  "conversationId": zod.string().uuid(),
   "reply": zod.string()
 })
 

@@ -7,6 +7,8 @@
  */
 
 export * from './apiError';
+export * from './chatConversation';
+export * from './chatConversationSummary';
 export * from './chatMessage';
 export * from './chatMessageRole';
 export * from './chatRequest';

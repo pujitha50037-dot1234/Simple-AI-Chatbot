@@ -21,21 +21,41 @@ export interface ChatMessage {
   role: ChatMessageRole;
   /**
      * @minLength 1
-     * @maxLength 12000
+     * @maxLength 50000
      */
   content: string;
 }
 
 export interface ChatRequest {
   /**
-     * @minItems 1
-     * @maxItems 24
+     * Existing conversation to continue, or null to start a new one
+     * @nullable
      */
-  messages: ChatMessage[];
+  conversationId?: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 12000
+     */
+  message: string;
 }
 
 export interface ChatResponse {
+  conversationId: string;
   reply: string;
+}
+
+export interface ChatConversationSummary {
+  id: string;
+  title: string;
+  updatedAt: string;
+}
+
+export interface ChatConversation {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ApiError {

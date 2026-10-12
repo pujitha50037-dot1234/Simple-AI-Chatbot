@@ -5,12 +5,16 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import type { ChatMessage } from './chatMessage';
 
 export interface ChatRequest {
   /**
-     * @minItems 1
-     * @maxItems 24
+     * Existing conversation to continue, or null to start a new one
+     * @nullable
      */
-  messages: ChatMessage[];
+  conversationId?: string | null;
+  /**
+     * @minLength 1
+     * @maxLength 12000
+     */
+  message: string;
 }

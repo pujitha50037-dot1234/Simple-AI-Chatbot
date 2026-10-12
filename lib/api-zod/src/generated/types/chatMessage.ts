@@ -11,7 +11,7 @@ export interface ChatMessage {
   role: ChatMessageRole;
   /**
      * @minLength 1
-     * @maxLength 12000
+     * @maxLength 50000
      */
   content: string;
 }

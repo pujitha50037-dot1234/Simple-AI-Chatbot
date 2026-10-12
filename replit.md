@@ -1,6 +1,6 @@
 # AI Chatbot
 
-A simple, anonymous chat app that sends conversation context to Gemini and keeps messages in browser memory for the current session.
+A simple, anonymous chat app that sends conversation context to Gemini and saves chat history in Supabase.
 
 ## Run & Operate
 
@@ -10,6 +10,8 @@ A simple, anonymous chat app that sends conversation context to Gemini and keeps
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - Required secret: `GEMINI_API_KEY` — used by the API server for Gemini responses; API usage is billed by Google under the key's account
+- Required secrets: `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` — used only by the API server
+- Apply `supabase/migrations/202610120001_create_chat_conversations.sql` in the Supabase SQL Editor before using chat history
 
 ## Stack
 
@@ -23,20 +25,24 @@ A simple, anonymous chat app that sends conversation context to Gemini and keeps
 
 ## Where things live
 
-- `artifacts/ai-chatbot/src/pages/chat.tsx` — chat screen and browser-session state
+- `artifacts/ai-chatbot/src/pages/chat.tsx` — chat screen and saved conversation history UI
 - `artifacts/ai-chatbot/src/index.css` — chatbot visual theme
-- `artifacts/api-server/src/routes/chat.ts` — server-side Gemini API request
+- `artifacts/api-server/src/routes/chat.ts` — server-side Gemini request and Supabase persistence
+- `artifacts/api-server/src/lib/supabase-rest.ts` — server-only Supabase REST client
+- `artifacts/api-server/src/lib/chat-visitor.ts` — anonymous browser-session cookie
+- `supabase/migrations/202610120001_create_chat_conversations.sql` — chat history table and index
 - `lib/api-spec/openapi.yaml` — chat endpoint contract
 
 ## Architecture decisions
 
-- Conversation history stays in browser memory and is not persisted to a database.
+- Conversations are scoped to a random, HTTP-only browser cookie and persisted in Supabase; clearing that cookie loses access to the anonymous history.
+- The Supabase service-role key is used only on the API server. Row Level Security is enabled with no public policies; server queries filter by the browser-session ID.
 - The Gemini key is read server-side; it is never sent to the browser.
-- API requests are bounded by message count and total text length.
+- Chat context and stored history are bounded to control request and row size.
 
 ## Product
 
-- Users can ask questions, continue a conversation with Gemini, retry failed requests, and start over.
+- Users can ask questions, continue a conversation with Gemini, retry failed requests, start a new chat, reopen saved conversations, and delete conversation history.
 
 ## User preferences
 

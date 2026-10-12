@@ -7,5 +7,6 @@
  */
 
 export interface ChatResponse {
+  conversationId: string;
   reply: string;
 }
